@@ -1,0 +1,85 @@
+---
+title: Getting Started
+description: Run the re-mind stack locally and connect the browser, API, database, and Vapi webhook.
+---
+
+`re-mind` is a local-first reminder app made of a React SPA, a FastAPI backend, SQLite storage, and a Vapi assistant. The normal development path runs the web app, API, and webhook tunnel together.
+
+## Requirements
+
+- Node.js and pnpm for the frontend in `web/`
+- Python 3.12 and uv for the backend in `api/`
+- Vite+ global CLI (`vp`) for frontend tooling
+- `just` for workspace commands
+- `cloudflared` when using the combined `just dev` Vapi webhook tunnel
+
+## Install dependencies
+
+```bash
+cd web && pnpm install
+cd ../api && uv sync
+```
+
+## Configure environment
+
+Copy the example environment file from the repository root:
+
+```bash
+cp .env.example .env
+```
+
+Set local development values:
+
+```bash
+CORS_ORIGINS=http://localhost:5173
+DATABASE_PATH=../data/reminders.sqlite
+VAPI_WEBHOOK_SECRET=<shared webhook secret>
+VITE_API_URL=http://localhost:8000
+VITE_VAPI_ASSISTANT_ID=<vapi assistant id>
+VITE_VAPI_PUBLIC_KEY=<vapi public key>
+```
+
+## Run the full stack
+
+From the repository root:
+
+```bash
+just dev
+```
+
+This starts three processes:
+
+- FastAPI on `http://localhost:8000`
+- React/Vite+ on `http://localhost:5173`
+- A Cloudflare tunnel to the API for Vapi webhooks
+
+Use the generated tunnel URL plus `/vapi/webhook` as the Vapi assistant webhook URL. Send the same value as `VAPI_WEBHOOK_SECRET` through either a bearer token or the `X-Vapi-Secret` header.
+
+## Run services separately
+
+```bash
+just web
+just api
+```
+
+## Local URLs
+
+- Web app: `http://localhost:5173`
+- API: `http://localhost:8000`
+- OpenAPI UI: `http://localhost:8000/docs`
+
+## Generate frontend API types
+
+After the API is running:
+
+```bash
+just generate-api-client
+```
+
+The generated file is reserved at `web/src/lib/api-client.generated.ts`.
+
+## Next steps
+
+- Read [System Architecture](../architecture/) for the end-to-end data flow.
+- Read [Voice Assistant](../voice-assistant/) before configuring Vapi tools.
+- Read [Local Development](../operations/local-development/) for verification commands.

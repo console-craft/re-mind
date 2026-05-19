@@ -1,0 +1,274 @@
+@font-face {
+  font-family: "Symbols Nerd Font Mono";
+  src: url("/fonts/symbols-nerdfont-mono.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root,
+::backdrop {
+  --sl-color-white: #e6d5ae;
+  --sl-color-gray-1: #e6d5ae;
+  --sl-color-gray-2: #d4be98;
+  --sl-color-gray-3: #c9b58a;
+  --sl-color-gray-4: #928374;
+  --sl-color-gray-5: #695e55;
+  --sl-color-gray-6: #4c4641;
+  --sl-color-black: #302e2c;
+  --sl-color-accent-low: #2a3330;
+  --sl-color-accent: #7daea3;
+  --sl-color-accent-high: #d4be98;
+  --sl-color-text: #e6d5ae;
+  --sl-color-text-accent: #7daea3;
+  --sl-color-bg: #302e2c;
+  --sl-color-bg-nav: rgba(51, 48, 46, 0.94);
+  --sl-color-bg-sidebar: #33302e;
+  --sl-color-bg-inline-code: #2a2928;
+  --sl-color-bg-accent: #7daea3;
+  --sl-color-hairline: #4c4641;
+  --sl-color-hairline-light: #5a524b;
+  --sl-color-hairline-shade: #2a2928;
+  --sl-font: "JetBrains Mono", "Symbols Nerd Font Mono", monospace;
+  --sl-font-mono: "JetBrains Mono", "Symbols Nerd Font Mono", monospace;
+  --ts-color-card: #33302e;
+  --ts-color-card-muted: #2a2928;
+  --ts-color-link: #7daea3;
+  --ts-color-link-hover: #8ec7ba;
+  --ts-color-inline-code: #bac584;
+  --ts-radius: 0.6rem;
+  --sl-shadow-sm: 0 0 0 1px rgba(76, 70, 65, 0.9);
+  --sl-shadow-md: 0 10px 24px rgba(18, 16, 15, 0.28);
+  --sl-shadow-lg: 0 18px 36px rgba(18, 16, 15, 0.34);
+}
+
+:root[data-theme="light"],
+[data-theme="light"] ::backdrop {
+  --sl-color-white: #3c3836;
+  --sl-color-gray-1: #504945;
+  --sl-color-gray-2: #665c54;
+  --sl-color-gray-3: #7c6f64;
+  --sl-color-gray-4: #928374;
+  --sl-color-gray-5: #d4be98;
+  --sl-color-gray-6: #e6d5ae;
+  --sl-color-gray-7: #ede0c0;
+  --sl-color-black: #f2ead6;
+  --sl-color-accent-low: #d8dfc7;
+  --sl-color-accent: #5f9b91;
+  --sl-color-accent-high: #42776f;
+  --sl-color-text: #3c3836;
+  --sl-color-text-accent: #42776f;
+  --sl-color-bg: #f2ead6;
+  --sl-color-bg-nav: rgba(237, 224, 192, 0.94);
+  --sl-color-bg-sidebar: #ede0c0;
+  --sl-color-bg-inline-code: #e6d5ae;
+  --sl-color-bg-accent: #5f9b91;
+  --sl-color-hairline: #d4be98;
+  --sl-color-hairline-light: #c9b58a;
+  --sl-color-hairline-shade: #e1cd9f;
+  --ts-color-card: #ede0c0;
+  --ts-color-card-muted: #e6d5ae;
+  --ts-color-link: #42776f;
+  --ts-color-link-hover: #2f635c;
+  --ts-color-inline-code: #79740e;
+  --sl-shadow-sm: 0 0 0 1px rgba(212, 190, 152, 0.9);
+  --sl-shadow-md: 0 10px 24px rgba(80, 73, 69, 0.12);
+  --sl-shadow-lg: 0 18px 36px rgba(80, 73, 69, 0.16);
+}
+
+html {
+  background: var(--sl-color-bg);
+  scrollbar-color: color-mix(in oklab, var(--sl-color-gray-3) 55%, transparent) transparent;
+  scrollbar-width: thin;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 0%, color-mix(in oklab, var(--sl-color-accent) 16%, transparent), transparent 40%),
+    radial-gradient(circle at 88% 8%, rgba(181, 118, 20, 0.1), transparent 38%), var(--sl-color-bg);
+
+  background-repeat: no-repeat;
+  background-size:
+    100vw 100vh,
+    100vw 100vh,
+    auto;
+
+  background-position:
+    top left,
+    top left,
+    top left;
+
+  font-size: 13px;
+}
+
+::-webkit-scrollbar {
+  height: 0.45rem;
+  width: 0.45rem;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--sl-color-gray-3) 48%, transparent);
+  border-radius: 999px;
+}
+
+a,
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--ts-color-link);
+}
+
+a:hover,
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  color: var(--ts-color-link-hover);
+}
+
+h2 {
+  font-size: 0.7em;
+  margin-right: 0.5em;
+}
+
+h3 {
+  font-size: 0.68em;
+}
+
+h4 {
+  font-size: 0.66em;
+}
+
+.sidebar-pane,
+.right-sidebar {
+  background-color: var(--sl-color-bg-nav);
+}
+
+.site-title,
+.sidebar-content .large,
+.sl-markdown-content :is(h1, h2, h3, h4) {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.site-title {
+  color: var(--sl-color-text);
+  gap: 0.6rem;
+}
+
+.site-title img {
+  border-radius: 0.25rem;
+  height: 1.65rem;
+  width: 1.65rem;
+}
+
+.pagination-links a {
+  background: color-mix(in oklab, var(--ts-color-card) 72%, transparent);
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.pagination-links a:hover {
+  border-color: color-mix(in oklab, var(--sl-color-accent) 52%, var(--sl-color-hairline));
+  color: var(--sl-color-text);
+  transform: translateY(-2px);
+}
+
+.pagination-links span {
+  color: var(--sl-color-text);
+  font-weight: 800;
+  font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+}
+.pagination-links .link-title {
+  color: var(--ts-color-link);
+  font-size: 0.7em;
+  font-weight: 400;
+}
+
+.sidebar-content summary {
+  color: var(--sl-color-white);
+}
+
+.right-sidebar a {
+  color: var(--sl-color-gray-3);
+}
+
+.right-sidebar a[aria-current="true"] {
+  color: var(--ts-color-inline-code);
+  font-weight: 700;
+}
+
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover,
+.sidebar-content a[aria-current="page"]:focus {
+  color: var(--sl-color-text);
+  background-color: var(--sl-color-gray-6);
+}
+
+.sidebar-content a,
+.right-sidebar a {
+  border-radius: 0.45rem;
+  font-size: 0.95em;
+  margin: 0.3rem 0;
+}
+
+.sidebar-content a:hover {
+  background: color-mix(in oklab, var(--ts-color-card-muted) 72%, transparent);
+}
+
+.right-sidebar a:hover {
+  background: color-mix(in oklab, var(--ts-color-card-muted) 72%, transparent);
+  color: var(--sl-color-text);
+}
+
+[data-has-hero] .main-pane {
+  padding: clamp(0.8rem, 1vw, 1.15rem);
+}
+
+.hero {
+  gap: clamp(1.2rem, 4vw, 3rem);
+  padding: clamp(1.2rem, 4vw, 3rem) 0;
+}
+
+@media (min-width: 50rem) {
+  .hero {
+    grid-template-columns: 1fr minmax(0, 1fr);
+  }
+}
+
+.hero h1 {
+  text-transform: uppercase;
+}
+
+.hero .tagline {
+  color: var(--sl-color-gray-2);
+  font-weight: 500;
+  max-width: 46ch;
+}
+
+.hero > img {
+  background: var(--ts-color-card-muted);
+  border: 1px solid var(--sl-color-hairline-light);
+  border-radius: var(--ts-radius);
+  box-shadow: var(--sl-shadow-lg);
+  width: min(100%, 36rem);
+}
+
+.sl-link-button {
+  border-radius: 0.55rem;
+  font-weight: 700;
+  width: 220px;
+  height: 3rem;
+  justify-content: center;
+}
+
+.sl-link-button.primary {
+  color: var(--sl-color-bg);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--sl-color-accent-high) 38%, transparent);
+}
+
+.sl-link-button.primary:hover {
+  color: var(--sl-color-bg);
+}
+
+.sl-link-button:not(.primary) {
+  background: var(--ts-color-card-muted);
+  border-color: var(--sl-color-hairline);
+}

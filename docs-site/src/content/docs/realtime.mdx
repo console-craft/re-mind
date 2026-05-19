@@ -1,0 +1,42 @@
+---
+title: Realtime Updates
+description: How re-mind uses server-sent events to keep the reminder list fresh.
+---
+
+`re-mind` uses server-sent events for one-way browser refresh notifications. The event stream is intentionally lightweight: it does not carry reminder payloads, only change notifications.
+
+## Server broadcaster
+
+`api/app/events/broadcaster.py` keeps an in-memory set of subscriber queues. When a browser connects, `event_stream()` adds a new queue, yields an initial `connected` comment, and then yields events from that queue until the client disconnects.
+
+Mutations call:
+
+```python
+await publish_event("reminders.changed")
+```
+
+The broadcaster enqueues the event for every current subscriber.
+
+## Event route
+
+The events router exposes:
+
+```text
+GET /events
+```
+
+The React app consumes this with the browser `EventSource` API.
+
+## Browser behavior
+
+`RemindersList` registers a listener for `reminders.changed`. On every event it reloads scheduled reminders with `GET /reminders`.
+
+This design keeps SSE messages stable even if reminder response shapes evolve: the REST API remains the source of truth for current reminder data.
+
+## Operational limits
+
+- The broadcaster is process-local and in-memory.
+- Events are not persisted or replayed after reconnect.
+- Multiple backend processes would not share subscribers without an external pub/sub layer.
+
+Those tradeoffs fit local development and a small single-process deployment. If `re-mind` needed horizontal scaling, this layer would be the first place to introduce Redis, Postgres notifications, or another shared event bus.

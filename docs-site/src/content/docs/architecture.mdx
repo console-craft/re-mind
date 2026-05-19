@@ -1,0 +1,51 @@
+---
+title: System Architecture
+description: End-to-end architecture of the re-mind frontend, API, database, voice assistant, and realtime update path.
+---
+
+`re-mind` is intentionally small: the browser owns the voice-call UI, FastAPI owns all durable reminder mutations, SQLite stores reminder state, and Vapi acts as the speech interface that calls backend tools.
+
+## Runtime components
+
+| Component | Location | Responsibility |
+| --- | --- | --- |
+| React SPA | `web/` | Phone-first UI, Vapi browser call lifecycle, reminder list rendering. |
+| FastAPI API | `api/app/` | HTTP routes, Vapi webhook handling, CORS, database initialization. |
+| SQLite database | `data/reminders.sqlite` | Local reminder persistence. |
+| Vapi assistant | External service | Speech conversation, natural-language interpretation, tool-call dispatch. |
+| SSE broadcaster | `api/app/events/` | Pushes reminder-change notifications to connected browsers. |
+
+## Primary flow
+
+1. The user opens the React SPA and taps **Remind me**.
+2. `useVapiCall` starts a Vapi browser call with assistant credentials from Vite environment variables.
+3. The browser sends `current_date`, `current_datetime`, and `timezone` variables to help the assistant resolve relative dates.
+4. Vapi speaks with the user and sends tool-call webhook messages to `POST /vapi/webhook`.
+5. FastAPI validates the webhook secret, dispatches the requested tool, validates arguments with Pydantic, and writes through the reminder repository.
+6. Successful mutations publish `reminders.changed` through the in-memory SSE broadcaster.
+7. `RemindersList` receives the event from `/events`, reloads `GET /reminders`, and animates removed cards out of the list.
+
+## Trust boundaries
+
+- Browser Vapi credentials are public-client values loaded through `VITE_VAPI_PUBLIC_KEY` and `VITE_VAPI_ASSISTANT_ID`.
+- Vapi webhook writes require `VAPI_WEBHOOK_SECRET` as a bearer token or `X-Vapi-Secret` header.
+- CORS origins are configured through `CORS_ORIGINS`, defaulting to the local Vite dev server.
+- SQLite is local process storage, not a shared distributed database.
+
+## State model
+
+The `reminders` table stores scheduled reminders with these core fields:
+
+- `id`, `title`, `details`
+- `starts_at`, `duration_minutes`, `time_kind`
+- `status`, `created_at`, `updated_at`
+- `source_call_id` for reminders created through a Vapi call
+
+Deletion is modeled as cancellation: `DELETE /reminders/{id}` updates `status` to `cancelled` instead of removing the row.
+
+## Documentation map
+
+- [Frontend](../frontend/) describes the React components and browser call hook.
+- [Backend](../backend/) describes FastAPI routes, repository helpers, and SQLite schema.
+- [Voice Assistant](../voice-assistant/) describes Vapi webhook dispatch and tool semantics.
+- [Realtime Updates](../realtime/) describes the SSE event path.

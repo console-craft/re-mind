@@ -1,0 +1,90 @@
+---
+title: Re-mind
+description: Technical documentation for the voice-first reminder app.
+template: splash
+hero:
+  tagline: Voice-first reminders with React, FastAPI, SQLite, Vapi, and live browser updates.
+  image:
+    html: |
+      <iframe
+        style="width:100%"
+        src="https://www.youtube.com/embed/bxzorOT18Dk"
+        title="re-mind demo video placeholder"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+      ></iframe>
+  actions:
+    - text: Getting Started
+      link: ./getting-started/
+      icon: right-arrow
+    - text: Architecture
+      link: ./architecture/
+      variant: minimal
+---
+
+<section class="ts-home-section ts-home-features" aria-labelledby="features">
+	<div class="ts-home-section-heading">
+		<span class="ts-home-eyebrow">Architecture</span>
+		<h2 id="features">Core systems</h2>
+	</div>
+
+	<div class="ts-home-feature-grid">
+		<article class="ts-home-feature ts-home-feature-primary">
+			<span class="ts-home-feature-tag">Voice Capture</span>
+			<h3>Tap once, speak naturally</h3>
+			<p>The React SPA starts a Vapi browser call and passes local date, time, and timezone variables so the assistant can resolve natural reminder requests.</p>
+		</article>
+		<article class="ts-home-feature">
+			<span class="ts-home-feature-tag">Tool Calls</span>
+			<h3>Webhook-driven actions</h3>
+			<p>Vapi sends tool-call messages to FastAPI, which creates, reviews, updates, deletes, and conflict-checks reminders.</p>
+		</article>
+		<article class="ts-home-feature">
+			<span class="ts-home-feature-tag">SQLite</span>
+			<h3>Local persistence</h3>
+			<p>Reminder state is stored in a small SQLite table with scheduled/cancelled status, timestamps, duration, and source call metadata.</p>
+		</article>
+		<article class="ts-home-feature">
+			<span class="ts-home-feature-tag">SSE</span>
+			<h3>Live browser refresh</h3>
+			<p>Mutations publish <code>reminders.changed</code>; the browser listens on <code>/events</code> and reloads the upcoming reminder list.</p>
+		</article>
+		<article class="ts-home-feature">
+			<span class="ts-home-feature-tag">Phone UI</span>
+			<h3>Dark mobile shell</h3>
+			<p>The frontend is a compact React 19 and TypeScript app with plain CSS, a voice call panel, and an animated reminders list.</p>
+		</article>
+		<article class="ts-home-feature">
+			<span class="ts-home-feature-tag">Conflict Checks</span>
+			<h3>Overlap-aware scheduling</h3>
+			<p>Duration-based reminders can be checked against existing scheduled reminders before the assistant commits a change.</p>
+		</article>
+		<article class="ts-home-feature">
+			<span class="ts-home-feature-tag">Local Dev</span>
+			<h3>One-command workflow</h3>
+			<p><code>just dev</code> runs the API, web app, and a Cloudflare tunnel for Vapi webhook development.</p>
+		</article>
+	</div>
+</section>
+
+<section class="ts-home-section ts-home-next" aria-labelledby="where-next">
+	<div class="ts-home-section-heading">
+		<span class="ts-home-eyebrow">Explore</span>
+		<h2 id="where-next">Where to go next</h2>
+	</div>
+
+	<div class="ts-home-next-grid">
+		<a class="ts-home-next-card" href="./architecture/">
+			<span>01</span>
+			<p><strong>System Architecture</strong> - the request, voice, storage, and realtime data paths.</p>
+		</a>
+		<a class="ts-home-next-card" href="./voice-assistant/">
+			<span>02</span>
+			<p><strong>Voice Assistant</strong> - browser calls, webhook auth, and supported Vapi tools.</p>
+		</a>
+		<a class="ts-home-next-card" href="./operations/local-development/">
+			<span>03</span>
+			<p><strong>Local Development</strong> - run the stack, expose webhooks, and verify changes.</p>
+		</a>
+	</div>
+</section>

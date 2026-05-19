@@ -1,0 +1,59 @@
+---
+title: Voice Assistant Integration
+description: Vapi browser calls, webhook authentication, tool dispatch, and reminder tool behavior.
+---
+
+Vapi is the speech and conversation layer. The browser starts calls; FastAPI receives tool-call webhooks and owns all durable reminder changes.
+
+## Browser call setup
+
+`useVapiCall` reads `VITE_VAPI_PUBLIC_KEY` and `VITE_VAPI_ASSISTANT_ID`. On call start it sends these assistant variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `current_date` | Local calendar date in `YYYY-MM-DD` format. |
+| `current_datetime` | Local datetime with timezone offset. |
+| `timezone` | Browser-resolved IANA timezone, falling back to `UTC`. |
+
+These values let the assistant convert phrases like "tomorrow afternoon" into explicit ISO 8601 datetimes.
+
+## Webhook endpoint
+
+Vapi tool calls are sent to:
+
+```text
+POST /vapi/webhook
+```
+
+The backend accepts the shared webhook secret in either form:
+
+- `Authorization: Bearer <VAPI_WEBHOOK_SECRET>`
+- `X-Vapi-Secret: <VAPI_WEBHOOK_SECRET>`
+
+If the secret is missing from the environment, the endpoint returns `503`. If the provided secret is missing or invalid, it returns `401`.
+
+## Tool dispatch
+
+`api/app/vapi/router.py` only handles Vapi messages with `message.type === "tool-calls"`. Other messages return an empty `results` array.
+
+Each tool call is dispatched by function name and returns a `toolCallId` paired with a result object. Unsupported tools return a structured failure instead of raising.
+
+## Supported tools
+
+| Tool | Behavior |
+| --- | --- |
+| `check_reminder_conflicts` | Checks a proposed reminder window against scheduled reminders with durations. |
+| `create_reminder` | Creates a reminder after user confirmation and stores the Vapi call ID as `source_call_id`. |
+| `list_reminders` | Returns scheduled reminders so the assistant can review them with the user. |
+| `get_reminder` | Returns one scheduled reminder by ID. |
+| `update_reminder` | Applies confirmed partial changes to one scheduled reminder. |
+| `delete_reminder` | Cancels a scheduled reminder after confirmation. |
+
+## Prompt and tool source of truth
+
+Use these repository files when configuring the Vapi assistant:
+
+- `vapi-system-prompt.md` for assistant behavior.
+- `vapi-tool-descriptions.md` for tool parameter definitions.
+
+The backend is still the final validator. Tool arguments are parsed, validated with Pydantic models, and rejected with `success: false` when invalid.

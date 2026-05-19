@@ -1,0 +1,54 @@
+---
+title: Backend Architecture
+description: FastAPI routing, SQLite persistence, reminder schemas, and mutation events.
+---
+
+The backend is a FastAPI app in `api/`, managed with uv. It exposes reminder HTTP routes, Vapi webhook routes, an SSE stream, and a health endpoint.
+
+## App setup
+
+`api/app/main.py` creates the FastAPI app, configures CORS, initializes the SQLite schema during lifespan startup, and mounts feature routers:
+
+- `app.reminders.router` for `/reminders`
+- `app.events.router` for `/events`
+- `app.vapi.router` for `/vapi/webhook`
+
+`get_cors_origins()` reads `CORS_ORIGINS`, defaulting to `http://localhost:5173`.
+
+## Database
+
+`api/app/database.py` resolves `DATABASE_PATH`, creates parent directories as needed, opens SQLite connections with row objects, and initializes the `reminders` table.
+
+The default database path is `api/data/reminders.sqlite` when `DATABASE_PATH` is unset. Local development typically sets it to `../data/reminders.sqlite` from the API working directory.
+
+## Reminder routes
+
+| Method | Path | Behavior |
+| --- | --- | --- |
+| `GET` | `/reminders` | Lists scheduled reminders by start time. |
+| `POST` | `/reminders` | Creates a scheduled reminder and publishes `reminders.changed`. |
+| `POST` | `/reminders/conflicts` | Checks whether a proposed duration overlaps existing scheduled reminders. |
+| `PATCH` | `/reminders/{reminder_id}` | Updates one scheduled reminder and publishes `reminders.changed`. |
+| `DELETE` | `/reminders/{reminder_id}` | Cancels one scheduled reminder and publishes `reminders.changed`. |
+
+## Repository layer
+
+`api/app/reminders/repository.py` is the only layer that writes reminder rows. It converts Pydantic models to SQLite parameters, serializes datetimes to ISO 8601 strings, and maps SQLite rows back to response models.
+
+Conflict detection is implemented in Python for clarity: scheduled reminders with durations are loaded, converted to comparable timestamps, and checked for interval overlap.
+
+## Schemas
+
+`api/app/reminders/schemas.py` defines request and response models:
+
+- `ReminderCreate`
+- `ReminderUpdate`
+- `ReminderConflictCheck`
+- `ReminderRead`
+- `ReminderConflictRead`
+
+`time_kind` is either `exact` or `date_only`. Update payloads reject explicitly setting `time_kind` to `null` because stored reminders always need a time kind.
+
+## Mutation events
+
+Reminder mutations from both HTTP routes and Vapi tool handlers call `publish_event("reminders.changed")`. The browser does not need to know which mutation happened; it treats the event as an instruction to reload scheduled reminders.

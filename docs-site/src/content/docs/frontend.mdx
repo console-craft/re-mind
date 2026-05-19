@@ -1,0 +1,58 @@
+---
+title: Frontend Architecture
+description: How the React SPA renders voice capture and live reminder state.
+---
+
+The frontend is a React 19, TypeScript, Vite+ app in `web/`. It is phone-first, dark-mode only, and uses plain CSS with variables instead of a component framework.
+
+## Entry points
+
+| File | Responsibility |
+| --- | --- |
+| `web/src/main.tsx` | Mounts the React app and global styles. |
+| `web/src/App.tsx` | Resolves `VITE_API_URL` and composes the app shell. |
+| `web/src/App.css` | App shell, hero panel, reminder cards, and animations. |
+| `web/src/index.css` | Global CSS variables and base dark theme styles. |
+
+## Voice capture panel
+
+`AddReminder` renders the main call-to-action. It delegates call state to `useVapiCall` and maps the hook status into button labels, disabled states, and short user-facing status text.
+
+The hook reads:
+
+- `VITE_VAPI_PUBLIC_KEY`
+- `VITE_VAPI_ASSISTANT_ID`
+
+If either value is missing, the UI stays visible but disables voice calls with a configuration message.
+
+## Vapi browser lifecycle
+
+`web/src/features/voice/useVapiCall.ts` owns one Vapi client instance in a ref. It handles these states:
+
+- `idle`
+- `connecting`
+- `live`
+- `ending`
+- `error`
+
+When starting a call, it passes `getCurrentCallVariables()` as Vapi `variableValues`. Those variables include the user's local date, local datetime with timezone offset, and IANA timezone name.
+
+## Reminder list
+
+`RemindersList` loads reminders from `GET /reminders` via `fetchReminders`. It also opens an `EventSource` to `${apiBaseUrl}/events` and listens for `reminders.changed`.
+
+The component keeps two collections:
+
+- `reminders`: the latest API data.
+- `displayedReminders`: rendered cards, including cards temporarily kept for exit animation.
+
+This split lets cancelled or deleted reminders animate out before being removed from the DOM.
+
+## Feature layout
+
+Frontend domain code lives under `web/src/features/`:
+
+- `features/reminders/` contains API calls, reminder types, and formatting helpers.
+- `features/voice/` contains Vapi call state and date/time helpers.
+
+Cross-feature helpers belong in `web/src/lib/utils.ts`; generated OpenAPI client types belong in `web/src/lib/api-client.generated.ts`.
