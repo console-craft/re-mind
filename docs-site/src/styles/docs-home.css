@@ -1,3 +1,19 @@
+.ts-home-video {
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: var(--ts-radius);
+  box-shadow: var(--sl-shadow-md);
+  margin-top: clamp(1rem, 3vw, 2rem);
+  overflow: hidden;
+  width: 100%;
+}
+
+.ts-home-video iframe {
+  border: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .ts-home-section {
   margin-top: clamp(2rem, 5vw, 4rem);
 }
